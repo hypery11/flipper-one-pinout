@@ -18,6 +18,16 @@
   --pin-cpu:      #60a5fa;          /* sky blue */
   --pin-usb:      #c084fc;          /* purple */
 
+  /* M.2-specific pin colours (some overlap with GPIO; both palettes coexist) */
+  --pin-pcie:    #f472b6;            /* pink   — PCIe / SATA / USB3 high-speed */
+  --pin-sim:     #fbbf24;            /* amber  — SIM / UIM */
+  --pin-config:  #94a3b8;            /* slate-blue — strap pins */
+  --pin-control: #60a5fa;            /* same as cpu-gpio — GPIO / control */
+  --pin-coex:    #34d399;            /* emerald — antenna / coex */
+  --pin-i2c:     #a78bfa;            /* violet — I²C */
+  --pin-nc:      #3f3f46;            /* almost background — not connected */
+  --pin-other:   #6b7280;            /* slate  — fallback */
+
   --mono: ui-monospace, "JetBrains Mono", SFMono-Regular, Menlo, Consolas, monospace;
   --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
 }
@@ -259,3 +269,148 @@ main {
 }
 .site-footer a { color: var(--text); }
 .site-footer a:hover { color: var(--accent); }
+
+/* ---- tabs ---- */
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 14px max(20px, 4vw) 0;
+  border-bottom: 1px solid var(--border);
+}
+.tab {
+  background: transparent;
+  border: 1px solid transparent;
+  border-bottom: none;
+  color: var(--text-dim);
+  padding: 9px 16px;
+  border-radius: 8px 8px 0 0;
+  font-size: 13px;
+  font-family: var(--sans);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  position: relative;
+  top: 1px;
+  transition: color 80ms ease, background 80ms ease, border-color 80ms ease;
+}
+.tab:hover { color: var(--text); }
+.tab.active {
+  color: var(--text);
+  background: var(--bg-elev);
+  border-color: var(--border);
+}
+.tab:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* The two pinout containers swap via the [hidden] attribute. */
+.conn-wrap[hidden] { display: none !important; }
+
+/* ---- M.2 layout ---- */
+
+.m2-board {
+  display: inline-block;
+  padding: 22px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.m2-row {
+  display: flex;
+  gap: 2px;
+  font-family: var(--mono);
+  margin: 0;
+}
+.m2-row + .m2-row { margin-top: 2px; }
+
+.m2-pin {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border);
+  border-top-width: 4px;     /* type colour swatch along the top */
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 80ms ease, border-color 80ms ease, box-shadow 80ms ease, opacity 120ms ease;
+}
+.m2-pin:hover  { transform: translateY(-1px); border-color: var(--accent); }
+.m2-pin.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(255, 133, 0, 0.25);
+}
+.m2-pin:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+.m2-pin.m2-gap {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-dim);
+  cursor: default;
+  opacity: 0.35;
+  font-size: 9px;
+}
+
+/* M.2 pin top-edge swatches by signal type */
+.m2-pin[data-type="power"]   { border-top-color: var(--pin-power); }
+.m2-pin[data-type="gnd"]     { border-top-color: var(--pin-gnd); }
+.m2-pin[data-type="usb"]     { border-top-color: var(--pin-usb); }
+.m2-pin[data-type="pcie"]    { border-top-color: var(--pin-pcie); }
+.m2-pin[data-type="sim"]     { border-top-color: var(--pin-sim); }
+.m2-pin[data-type="config"]  { border-top-color: var(--pin-config); }
+.m2-pin[data-type="control"] { border-top-color: var(--pin-control); }
+.m2-pin[data-type="coex"]    { border-top-color: var(--pin-coex); }
+.m2-pin[data-type="i2c"]     { border-top-color: var(--pin-i2c); }
+.m2-pin[data-type="nc"]      { border-top-color: var(--pin-nc); }
+.m2-pin[data-type="other"]   { border-top-color: var(--pin-other); }
+
+.m2-row-odd  .m2-pin { border-top-width: 4px; border-bottom-width: 1px; }
+.m2-row-even .m2-pin {
+  /* visually flip the swatch to the bottom edge for the lower row,
+     so the two rows mirror each other like a real connector */
+  border-top-width: 1px;
+  border-bottom-width: 4px;
+  border-bottom-color: var(--border);
+}
+.m2-row-even .m2-pin[data-type="power"]   { border-bottom-color: var(--pin-power); }
+.m2-row-even .m2-pin[data-type="gnd"]     { border-bottom-color: var(--pin-gnd); }
+.m2-row-even .m2-pin[data-type="usb"]     { border-bottom-color: var(--pin-usb); }
+.m2-row-even .m2-pin[data-type="pcie"]    { border-bottom-color: var(--pin-pcie); }
+.m2-row-even .m2-pin[data-type="sim"]     { border-bottom-color: var(--pin-sim); }
+.m2-row-even .m2-pin[data-type="config"]  { border-bottom-color: var(--pin-config); }
+.m2-row-even .m2-pin[data-type="control"] { border-bottom-color: var(--pin-control); }
+.m2-row-even .m2-pin[data-type="coex"]    { border-bottom-color: var(--pin-coex); }
+.m2-row-even .m2-pin[data-type="i2c"]     { border-bottom-color: var(--pin-i2c); }
+.m2-row-even .m2-pin[data-type="nc"]      { border-bottom-color: var(--pin-nc); }
+.m2-row-even .m2-pin[data-type="other"]   { border-bottom-color: var(--pin-other); }
+
+.m2-pin.dimmed { opacity: 0.22; }
+
+.m2-legend {
+  margin: 10px 4px 0;
+  font-size: 11px;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+.m2-name {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--text);
+  word-break: break-word;
+}
+.m2-type-note { text-transform: capitalize; }

@@ -173,9 +173,9 @@ const HEADER_ROWS = [
   }
 ];
 
-// Functional filters — map a filter to the test that decides whether a pin matches.
+// Functional filters for the GPIO header.
 // "all" is a special case handled in the UI code.
-const FILTERS = [
+const GPIO_FILTERS = [
   { id: "all",       label: "All",       test: () => true },
   { id: "power",     label: "Power",     test: p => p.type === "power" },
   { id: "gnd",       label: "Ground",    test: p => p.type === "gnd" },
@@ -192,4 +192,93 @@ const FILTERS = [
   { id: "spdif",     label: "S/PDIF",    test: p => p.alts.some(a => a.signal.startsWith("SPDIF")) },
   { id: "adc",       label: "ADC",       test: p => p.alts.some(a => a.signal.startsWith("ADC")) },
   { id: "pio",       label: "PIO",       test: p => p.alts.some(a => a.signal === "PIO") }
+];
+
+// --- M.2 port -----------------------------------------------------------------
+//
+// Flipper One uses an M.2 Key-B (S3) connector. Standard Key-B has 75 pin
+// positions; pins 12–19 are physically absent (the connector key occupies that
+// region). Sourced verbatim from https://docs.flipper.net/one/hardware/m2-port
+
+const M2_PINS = [
+  { pin:  1, desc: "CONFIG_3", type: "config" },
+  { pin:  2, desc: "3.3V", type: "power" },
+  { pin:  3, desc: "GND", type: "gnd" },
+  { pin:  4, desc: "3.3V", type: "power" },
+  { pin:  5, desc: "GND", type: "gnd" },
+  { pin:  6, desc: "FULL_CARD_POWER_OFF# (O)(0/1.8V or 3.3V)", type: "control" },
+  { pin:  7, desc: "USB_D+", type: "usb" },
+  { pin:  8, desc: "W_DISABLE1# (O)(0/1.8V/3.3V)", type: "control" },
+  { pin:  9, desc: "USB_D-", type: "usb" },
+  { pin: 10, desc: "GPIO_9/DAS/DSS (I/O)/LED_1# (I)(0/3.3V)", type: "control" },
+  { pin: 11, desc: "GND", type: "gnd" },
+  { pin: 20, desc: "GPIO_5 (I/O)(0/1.8V)", type: "control" },
+  { pin: 21, desc: "CONFIG_0", type: "config" },
+  { pin: 22, desc: "GPIO_6 (I/O)(0/1.8V)", type: "control" },
+  { pin: 23, desc: "GPIO_11 (I/O)(0/1.8V)", type: "control" },
+  { pin: 24, desc: "GPIO_7 (I/O)(0/1.8V)", type: "control" },
+  { pin: 25, desc: "DPR (O)(0/1.8V)", type: "control" },
+  { pin: 26, desc: "GPIO_10 (I/O)(0/1.8V)", type: "control" },
+  { pin: 27, desc: "GND", type: "gnd" },
+  { pin: 28, desc: "PLA_S2# (I)/GPIO_8 (I/O)(0/1.8V)", type: "control" },
+  { pin: 29, desc: "PERn1/USB3.1-Rx-/SSIC-RxN", type: "pcie" },
+  { pin: 30, desc: "UIM_RESET (I)", type: "sim" },
+  { pin: 31, desc: "PERp1/USB3.1-Rx+/SSIC-RxP", type: "pcie" },
+  { pin: 32, desc: "UIM_CLK (I)", type: "sim" },
+  { pin: 33, desc: "GND", type: "gnd" },
+  { pin: 34, desc: "UIM_DATA (I/O)", type: "sim" },
+  { pin: 35, desc: "PETn1/USB3.1-Tx-/SSIC-TxN", type: "pcie" },
+  { pin: 36, desc: "UIM_PWR (I)", type: "sim" },
+  { pin: 37, desc: "PETp1/USB3.1-Tx+/SSIC-TxP", type: "pcie" },
+  { pin: 38, desc: "DEVSLP (O)", type: "control" },
+  { pin: 39, desc: "GND", type: "gnd" },
+  { pin: 40, desc: "GPIO_0 (I/O)/SMB_CLK (I/O)/(0/1.8V)", type: "control" },
+  { pin: 41, desc: "PERn0/SATA-B+", type: "pcie" },
+  { pin: 42, desc: "GPIO_1 (I/O)/SMB_DATA (I/O)/(0/1.8V)", type: "control" },
+  { pin: 43, desc: "PERp0/SATA-B-", type: "pcie" },
+  { pin: 44, desc: "GPIO_2 (I/O)/ALERT# (I)(0/1.8V)", type: "control" },
+  { pin: 45, desc: "GND", type: "gnd" },
+  { pin: 46, desc: "GPIO_3 (I/O)(0/1.8V)", type: "control" },
+  { pin: 47, desc: "PETn0/SATA-A-", type: "pcie" },
+  { pin: 48, desc: "GPIO_4 (I/O)(0/1.8V)", type: "control" },
+  { pin: 49, desc: "PETp0/SATA-A+", type: "pcie" },
+  { pin: 50, desc: "PERST# (O)(0/1.8V/3.3V)", type: "pcie" },
+  { pin: 51, desc: "GND", type: "gnd" },
+  { pin: 52, desc: "CLKREQ# (I/O)(0/1.8V/3.3V)", type: "pcie" },
+  { pin: 53, desc: "REFCLKn", type: "pcie" },
+  { pin: 54, desc: "PEWAKE# (I/O)(0/1.8V/3.3V)", type: "pcie" },
+  { pin: 55, desc: "REFCLKp", type: "pcie" },
+  { pin: 56, desc: "NC", type: "nc" },
+  { pin: 57, desc: "GND", type: "gnd" },
+  { pin: 58, desc: "NC", type: "nc" },
+  { pin: 59, desc: "ANTCTL0 (I)(0/1.8V)", type: "coex" },
+  { pin: 60, desc: "COEX3 (I/O)(0/1.8V)", type: "coex" },
+  { pin: 61, desc: "ANTCTL1 (I)(0/1.8V)", type: "coex" },
+  { pin: 62, desc: "COEX_TXD (O)(0/1.8V)", type: "coex" },
+  { pin: 63, desc: "ANTCTL2 (I)(0/1.8V)", type: "coex" },
+  { pin: 64, desc: "COEX_RXD (I)(0/1.8V)", type: "coex" },
+  { pin: 65, desc: "ANTCTL3 (I)(0/1.8V)", type: "coex" },
+  { pin: 66, desc: "SIM DETECT (O)", type: "sim" },
+  { pin: 67, desc: "RESET# (O)(0/1.8V)", type: "control" },
+  { pin: 68, desc: "SUSCLK (O)(0/1.8V/3.3V)", type: "control" },
+  { pin: 69, desc: "CONFIG_1", type: "config" },
+  { pin: 70, desc: "3.3 V/VBAT", type: "power" },
+  { pin: 71, desc: "GND", type: "gnd" },
+  { pin: 72, desc: "3.3 V/VBAT", type: "power" },
+  { pin: 73, desc: "VIO_CFG (I) or GND", type: "other" },
+  { pin: 74, desc: "3.3 V/VBAT", type: "power" },
+  { pin: 75, desc: "CONFIG_2", type: "config" }
+];
+
+const M2_FILTERS = [
+  { id: "all",     label: "All",     test: () => true },
+  { id: "power",   label: "Power",   test: p => p.type === "power" },
+  { id: "gnd",     label: "Ground",  test: p => p.type === "gnd" },
+  { id: "usb",     label: "USB",     test: p => p.type === "usb" },
+  { id: "pcie",    label: "PCIe / SATA / USB3", test: p => p.type === "pcie" },
+  { id: "sim",     label: "SIM",     test: p => p.type === "sim" },
+  { id: "config",  label: "Config",  test: p => p.type === "config" },
+  { id: "control", label: "GPIO / Control", test: p => p.type === "control" },
+  { id: "coex",    label: "Antenna / Coex",  test: p => p.type === "coex" },
+  { id: "nc",      label: "NC",      test: p => p.type === "nc" }
 ];

@@ -4,26 +4,44 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Flipper One Pinout</title>
-  <meta name="description" content="Interactive pinout viewer for the Flipper One GPIO header. Click a pin to see its alternate-function mux configurations.">
+  <meta name="description" content="Interactive pinout viewer for the Flipper One GPIO header and M.2 port. Click a pin to see its functions and alternate-function mux configurations.">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="site-header">
     <h1>Flipper One Pinout</h1>
     <p class="subtitle">
-      Interactive viewer for the GPIO header. Click a pin to see its alternate-function mux configurations,
-      or use the filter chips to highlight every pin that can be configured for a given protocol.
+      Interactive viewer for the GPIO header and the M.2 port. Click a pin to see its functions
+      (and, on GPIO pins, the alternate-function mux configurations), or use the filter chips to
+      highlight every pin that matches a given protocol.
     </p>
   </header>
+
+  <nav class="tabs" aria-label="Connector">
+    <button type="button" class="tab active" data-target="gpio">GPIO header</button>
+    <button type="button" class="tab"        data-target="m2">M.2 port</button>
+  </nav>
 
   <main>
     <section class="filters" aria-label="Function filter">
       <div id="filter-bar"></div>
     </section>
 
-    <section class="header-area" aria-label="GPIO header layout">
-      <div class="header-wrap">
+    <section class="connector-area" aria-label="Connector layout">
+      <!-- GPIO header: vertical 2x10 grid with inline descriptions -->
+      <div class="conn-wrap" data-pinout="gpio">
         <div class="header-grid" id="header-grid"></div>
+      </div>
+
+      <!-- M.2 port: horizontal two-row layout, pin numbers only -->
+      <div class="conn-wrap" data-pinout="m2" hidden>
+        <div class="m2-board">
+          <div class="m2-row m2-row-odd"  id="m2-row-odd"></div>
+          <div class="m2-row m2-row-even" id="m2-row-even"></div>
+        </div>
+        <p class="m2-legend">
+          Pins 12–19 are physically absent — that's where the Key-B notch sits on the connector.
+        </p>
       </div>
     </section>
 
@@ -35,7 +53,10 @@
   <footer class="site-footer">
     <p>
       Data sourced from
-      <a href="https://docs.flipper.net/one/hardware/gpio-port" rel="noopener">docs.flipper.net/one/hardware/gpio-port</a>.
+      <a href="https://docs.flipper.net/one/hardware/gpio-port" rel="noopener">GPIO port</a>
+      and
+      <a href="https://docs.flipper.net/one/hardware/m2-port" rel="noopener">M.2 port</a>
+      docs.
       Not an official Flipper Devices project — community-maintained.
       <a href="https://github.com/hypery11/flipper-one-pinout" rel="noopener">Source &amp; corrections on GitHub</a>.
     </p>
