@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flipper One Pinout</title>
+  <meta name="description" content="Interactive pinout viewer for the Flipper One GPIO header. Click a pin to see its alternate-function mux configurations.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1>Flipper One Pinout</h1>
+    <p class="subtitle">
+      Interactive viewer for the GPIO header. Click a pin to see its alternate-function mux configurations,
+      or use the filter chips to highlight every pin that can be configured for a given protocol.
+    </p>
+  </header>
+
+  <main>
+    <section class="filters" aria-label="Function filter">
+      <div id="filter-bar"></div>
+    </section>
+
+    <section class="header-area" aria-label="GPIO header layout">
+      <div class="header-wrap">
+        <div class="header-grid" id="header-grid"></div>
+      </div>
+    </section>
+
+    <aside class="details" id="details" aria-live="polite">
+      <p class="placeholder">Select a pin to view its functions.</p>
+    </aside>
+  </main>
+
+  <footer class="site-footer">
+    <p>
+      Data sourced from
+      <a href="https://docs.flipper.net/one/hardware/gpio-port" rel="noopener">docs.flipper.net/one/hardware/gpio-port</a>.
+      Not an official Flipper Devices project — community-maintained.
+      <a href="https://github.com/hypery11/flipper-one-pinout" rel="noopener">Source &amp; corrections on GitHub</a>.
+    </p>
+  </footer>
+
+  <script src="pins.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
