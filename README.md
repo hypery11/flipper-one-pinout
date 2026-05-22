@@ -1,10 +1,15 @@
 # Flipper One Pinout
 
-Interactive pinout viewer for the [Flipper One](https://docs.flipper.net/one) GPIO header.
+Interactive pinout viewer for the [Flipper One](https://docs.flipper.net/one) GPIO header and M.2 port.
 
 **Live**: <https://hypery11.github.io/flipper-one-pinout/>
 
-Click a pin to see its alternate-function mux configurations, or use the filter chips at the top to highlight every pin that can be configured for a given protocol (I²C, UART, SPI, CAN, SAI, PWM, etc.).
+Two tabs:
+
+- **GPIO header** (2×10, 20 pins) — vertical layout with each pin's alternate-function mux configurations listed inline.
+- **M.2 port** (Key-B, S3, 75 pin positions with pins 12–19 absent for keying) — horizontal two-row layout, click a pin to see its description.
+
+Filter chips at the top of each tab highlight every pin matching a given protocol (I²C, UART, SPI, CAN, SAI, PWM, PCIe, SIM, etc.).
 
 ## Why this exists
 
@@ -12,10 +17,12 @@ Looking up which header pin can do `UART5_TX` (or which two pins form an `I2C2` 
 
 ## Data source
 
-All pin data is transcribed verbatim from
-[docs.flipper.net/one/hardware/gpio-port](https://docs.flipper.net/one/hardware/gpio-port). Errors in this viewer are mine; the original docs are the source of truth.
+All pin data is transcribed verbatim from the official Flipper One developer portal:
 
-If you spot a discrepancy, please [open an issue](https://github.com/hypery11/flipper-one-pinout/issues) or send a PR against `pins.js`.
+- GPIO header — [docs.flipper.net/one/hardware/gpio-port](https://docs.flipper.net/one/hardware/gpio-port)
+- M.2 port — [docs.flipper.net/one/hardware/m2-port](https://docs.flipper.net/one/hardware/m2-port)
+
+Errors in this viewer are mine; the original docs are the source of truth. If you spot a discrepancy, please [open an issue](https://github.com/hypery11/flipper-one-pinout/issues) or send a PR against `pins.js`.
 
 ## Local development
 
@@ -30,11 +37,12 @@ open http://localhost:8000
 
 ## Roadmap
 
-- [x] GPIO header (20 pins)
-- [ ] M.2 port pinout (Key-B, S3)
+- [x] GPIO header (20 pins, inline alt-function view)
+- [x] M.2 port (Key-B, 67 populated pin positions)
 - [ ] Search box (filter by signal name)
-- [ ] Permalink to a selected pin (`#B4` etc.)
+- [ ] Permalink to a selected pin (`#B4`, `#m2-42`, etc.)
 - [ ] Mobile-friendly responsive tweaks
+- [ ] SVG board diagram with pin highlight
 
 ## Not affiliated with Flipper Devices
 
