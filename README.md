@@ -9,7 +9,9 @@ Two tabs:
 - **GPIO header** (2×10, 20 pins) — vertical layout with each pin's alternate-function mux configurations listed inline.
 - **M.2 port** (Key-B, S3, 75 pin positions with pins 12–19 absent for keying) — horizontal two-row layout, click a pin to see its description.
 
-Filter chips at the top of each tab highlight every pin matching a given protocol (I²C, UART, SPI, CAN, SAI, PWM, PCIe, SIM, etc.).
+Filter chips at the top of each tab highlight every pin matching a given protocol (I²C, UART, SPI, CAN, SAI, PWM, PCIe, SIM, etc.). The search box accepts any substring of a signal name, pin label, or pin number, and combines (AND) with the active filter.
+
+Direct links to a specific pin work via the URL hash — `#gpio/B4`, `#gpio/D+`, `#m2/42`, `#m2/USB_D+` all open the right tab and pre-select the pin.
 
 ## Why this exists
 
@@ -39,8 +41,8 @@ open http://localhost:8000
 
 - [x] GPIO header (20 pins, inline alt-function view)
 - [x] M.2 port (Key-B, 67 populated pin positions)
-- [ ] Search box (filter by signal name)
-- [ ] Permalink to a selected pin (`#B4`, `#m2-42`, etc.)
+- [x] Search box — filter by signal, label, or pin number
+- [x] Permalink to a selected pin — `#gpio/B4`, `#m2/42`, etc.
 - [ ] Mobile-friendly responsive tweaks
 - [ ] SVG board diagram with pin highlight
 

@@ -23,6 +23,18 @@
   </nav>
 
   <main>
+    <section class="search" aria-label="Pin search">
+      <input
+        id="search-input"
+        type="search"
+        placeholder="Search by signal, label, or pin number…"
+        autocomplete="off"
+        spellcheck="false"
+        aria-label="Search pins by signal, label, or pin number"
+      />
+      <span id="search-count" class="search-count" aria-live="polite"></span>
+    </section>
+
     <section class="filters" aria-label="Function filter">
       <div id="filter-bar"></div>
     </section>

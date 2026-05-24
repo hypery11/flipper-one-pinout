@@ -1,23 +1,33 @@
 // Flipper One Pinout — interactive logic.
 //
-// Two pinouts share the same UI shell: a tab switcher at the top, a filter chip
-// bar, the connector itself, and a sticky details panel.
+// Two pinouts share the same UI shell: a tab switcher at the top, a search box,
+// a filter chip bar, the connector itself, and a sticky details panel.
 //
 // GPIO header uses an inline vertical grid (descriptions next to each pin).
 // M.2 port uses a horizontal two-row layout (pin numbers only; click to see the
 // description in the details panel).
+//
+// URL hash mirrors the visible state and is deep-linkable:
+//   #gpio          → GPIO tab, no selection
+//   #gpio/B4       → GPIO tab + pin B4 selected
+//   #m2            → M.2 tab, no selection
+//   #m2/42         → M.2 tab + pin 42 selected
 
 const grid       = document.getElementById("header-grid");
 const m2RowOdd   = document.getElementById("m2-row-odd");
 const m2RowEven  = document.getElementById("m2-row-even");
 const detailsBox = document.getElementById("details");
 const filterBar  = document.getElementById("filter-bar");
+const searchInput = document.getElementById("search-input");
+const searchCount = document.getElementById("search-count");
 const tabs       = document.querySelectorAll(".tabs .tab");
 const wraps      = document.querySelectorAll(".conn-wrap");
 
-let currentPinout = "gpio";           // "gpio" | "m2"
+let currentPinout = "gpio";                           // "gpio" | "m2"
 let activeFilter  = { gpio: "all", m2: "all" };
-let selectedKey   = { gpio: null, m2: null };  // selection is per-pinout
+let selectedKey   = { gpio: null, m2: null };         // per-pinout
+let searchQuery   = "";                                // shared across pinouts
+let suppressHashWrite = false;                         // re-entry guard for hash ↔ state
 
 // ---------- GPIO header layout ----------
 
@@ -30,7 +40,7 @@ function gpioPinList() {
   return out;
 }
 
-const GPIO_PIN_LIST = gpioPinList();
+const GPIO_PIN_LIST   = gpioPinList();
 const GPIO_PIN_BY_KEY = Object.fromEntries(GPIO_PIN_LIST.map(p => [p._key, p]));
 
 function gpioDescCellHTML(p) {
@@ -113,16 +123,17 @@ function renderM2Rows() {
 
 // ---------- tab switching ----------
 
-function setPinout(name) {
+function setPinout(name, { skipHashWrite = false } = {}) {
   currentPinout = name;
   tabs.forEach(t => t.classList.toggle("active", t.dataset.target === name));
   wraps.forEach(w => { w.hidden = w.dataset.pinout !== name; });
   renderFilters();
-  applyFilter();
+  applyFilterAndSearch();
   // Restore selection display for whichever pinout we're now showing.
   const sel = selectedKey[name];
   highlightSelection(sel);
   renderDetails(sel ? pinFor(sel) : null);
+  if (!skipHashWrite) writeHash();
 }
 
 tabs.forEach(t => t.addEventListener("click", () => setPinout(t.dataset.target)));
@@ -149,28 +160,69 @@ function renderFilters() {
 function setFilter(id) {
   activeFilter[currentPinout] = id;
   renderFilters();
-  applyFilter();
+  applyFilterAndSearch();
 }
 
-function applyFilter() {
+// ---------- search ----------
+
+function pinMatchesSearch(p) {
+  const q = searchQuery.trim().toLowerCase();
+  if (!q) return true;
+  if (currentPinout === "gpio") {
+    if ((p.label || "").toLowerCase().includes(q)) return true;
+    if ((p.name  || "").toLowerCase().includes(q)) return true;
+    if ((p.notes || "").toLowerCase().includes(q)) return true;
+    if (p.alts && p.alts.some(a => a.signal.toLowerCase().includes(q))) return true;
+    return false;
+  } else {
+    if (String(p.pin).includes(q)) return true;
+    if ((p.desc || "").toLowerCase().includes(q)) return true;
+    if ((p.type || "").toLowerCase().includes(q)) return true;
+    return false;
+  }
+}
+
+function applyFilterAndSearch() {
   const f = currentFilters().find(x => x.id === activeFilter[currentPinout]) || currentFilters()[0];
 
+  let visible = 0, total = 0;
   if (currentPinout === "gpio") {
     GPIO_PIN_LIST.forEach(p => {
-      const matches = f.test(p);
+      const matches = f.test(p) && pinMatchesSearch(p);
+      total += 1;
+      if (matches) visible += 1;
       document.querySelectorAll(`[data-key="${p._key}"]`).forEach(el => {
         el.classList.toggle("dimmed", !matches);
       });
     });
   } else {
     M2_PINS.forEach(p => {
-      const matches = f.test(p);
+      const matches = f.test(p) && pinMatchesSearch(p);
+      total += 1;
+      if (matches) visible += 1;
       document.querySelectorAll(`[data-key="m-${p.pin}"]`).forEach(el => {
         el.classList.toggle("dimmed", !matches);
       });
     });
   }
+
+  // Show count only when actively searching or filtering — silence when neither is active.
+  const filteringActive = activeFilter[currentPinout] !== "all" || searchQuery.trim();
+  if (filteringActive) {
+    searchCount.textContent = `${visible} of ${total} pins`;
+  } else {
+    searchCount.textContent = "";
+  }
 }
+
+let searchDebounce = null;
+searchInput.addEventListener("input", e => {
+  if (searchDebounce) clearTimeout(searchDebounce);
+  searchDebounce = setTimeout(() => {
+    searchQuery = e.target.value;
+    applyFilterAndSearch();
+  }, 50);
+});
 
 // ---------- selection / details ----------
 
@@ -178,7 +230,7 @@ function pinFor(key) {
   return GPIO_PIN_BY_KEY[key] || M2_PIN_BY_KEY[key] || null;
 }
 
-function selectPin(key) {
+function selectPin(key, { skipHashWrite = false } = {}) {
   if (selectedKey[currentPinout] === key) {
     selectedKey[currentPinout] = null;
     highlightSelection(null);
@@ -188,6 +240,7 @@ function selectPin(key) {
     highlightSelection(key);
     renderDetails(pinFor(key));
   }
+  if (!skipHashWrite) writeHash();
 }
 
 function highlightSelection(key) {
@@ -233,8 +286,57 @@ function renderDetails(p) {
   else renderM2Details(p);
 }
 
+// ---------- URL hash sync ----------
+
+function hashFromState() {
+  const sel = selectedKey[currentPinout];
+  if (currentPinout === "gpio") {
+    if (sel && GPIO_PIN_BY_KEY[sel]) {
+      return `#gpio/${encodeURIComponent(GPIO_PIN_BY_KEY[sel].label)}`;
+    }
+    return "#gpio";
+  }
+  if (sel && M2_PIN_BY_KEY[sel]) {
+    return `#m2/${M2_PIN_BY_KEY[sel].pin}`;
+  }
+  return "#m2";
+}
+
+function writeHash() {
+  if (suppressHashWrite) return;
+  const next = hashFromState();
+  if (window.location.hash !== next) {
+    history.replaceState(null, "", next);
+  }
+}
+
+function applyHash() {
+  const raw = (window.location.hash || "").slice(1);  // strip '#'
+  if (!raw) return;
+  const [tab, target] = raw.split("/", 2);
+  if (tab !== "gpio" && tab !== "m2") return;
+
+  suppressHashWrite = true;
+  setPinout(tab, { skipHashWrite: true });
+
+  if (target) {
+    if (tab === "gpio") {
+      const label = decodeURIComponent(target);
+      const pin = GPIO_PIN_LIST.find(p => p.label === label);
+      if (pin) selectPin(pin._key, { skipHashWrite: true });
+    } else {
+      const n = parseInt(target, 10);
+      if (n && M2_PIN_BY_KEY[`m-${n}`]) selectPin(`m-${n}`, { skipHashWrite: true });
+    }
+  }
+  suppressHashWrite = false;
+}
+
+window.addEventListener("hashchange", applyHash);
+
 // ---------- boot ----------
 
 renderGPIOGrid();
 renderM2Rows();
-setPinout("gpio");
+setPinout("gpio", { skipHashWrite: true });
+applyHash();   // restore deep-linked state on first load
