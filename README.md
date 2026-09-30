@@ -11,7 +11,7 @@ Two tabs:
 
 Filter chips at the top of each tab highlight every pin matching a given protocol (I²C, UART, SPI, CAN, SAI, PWM, PCIe, SIM, etc.). The search box accepts any substring of a signal name, pin label, or pin number, and combines (AND) with the active filter.
 
-Direct links to a specific pin work via the URL hash — `#gpio/B4`, `#gpio/D+`, `#m2/42`, `#m2/USB_D+` all open the right tab and pre-select the pin.
+Direct links to a specific pin work via the URL hash: `#gpio/B4`, `#gpio/D+` and `#m2/42` all open the right tab and pre-select the pin. GPIO links use the pin label, M.2 links use the pin number.
 
 ## Why this exists
 
