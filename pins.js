@@ -1,6 +1,7 @@
 // Flipper One GPIO header — 2x10 = 20 pin layout.
 // Data sourced from https://docs.flipper.net/one/hardware/gpio-port
-// (commit: docs/hardware/GPIO-port.md, public-release branch)
+// (docs/hardware/GPIO-port.md, flipperone-docs public-release branch;
+// last checked against commit 9a78a94, 2026-09-29)
 //
 // Each row corresponds to one physical row on the header. `left` is the pin
 // on the side of the table marked Description/PIN, `right` is the mirrored
@@ -10,7 +11,7 @@
 
 const HEADER_ROWS = [
   {
-    left:  { label: "3V3", type: "power", name: "3.3V Power", notes: "up to 2A EFUSE", alts: [] },
+    left:  { label: "3V3", type: "power", name: "3.3 V Power", notes: "up to 2A EFUSE", alts: [] },
     right: { label: "GND", type: "gnd",   name: "Ground",      notes: "",                alts: [] }
   },
   {
@@ -168,8 +169,8 @@ const HEADER_ROWS = [
     right: { label: "GND", type: "gnd",   name: "Ground",          notes: "",                alts: [] }
   },
   {
-    left:  { label: "D+",  type: "usb",   name: "CPU USB 2.0 D+",  notes: "USB 2.0 data positive", alts: [] },
-    right: { label: "D-",  type: "usb",   name: "CPU USB 2.0 D-",  notes: "USB 2.0 data negative", alts: [] }
+    left:  { label: "D+",  type: "usb",   name: "CPU USB 2.0 Data+", notes: "USB 2.0 data positive", alts: [] },
+    right: { label: "D-",  type: "usb",   name: "CPU USB 2.0 Data-", notes: "USB 2.0 data negative", alts: [] }
   }
 ];
 
@@ -199,6 +200,7 @@ const GPIO_FILTERS = [
 // Flipper One uses an M.2 Key-B (S3) connector. Standard Key-B has 75 pin
 // positions; pins 12–19 are physically absent (the connector key occupies that
 // region). Sourced verbatim from https://docs.flipper.net/one/hardware/m2-port
+// (docs/hardware/M2-port.md; last checked against commit 9a78a94, 2026-09-29)
 
 const M2_PINS = [
   { pin:  1, desc: "CONFIG_3", type: "config" },

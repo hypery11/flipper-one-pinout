@@ -24,6 +24,8 @@ All pin data is transcribed verbatim from the official Flipper One developer por
 - GPIO header — [docs.flipper.net/one/hardware/gpio-port](https://docs.flipper.net/one/hardware/gpio-port)
 - M.2 port — [docs.flipper.net/one/hardware/m2-port](https://docs.flipper.net/one/hardware/m2-port)
 
+Last checked against [flipperone-docs](https://github.com/flipperdevices/flipperone-docs) `public-release` at commit `9a78a94` (2026-09-29). The pinout tables on those pages have not changed since May 2026 and do not name a board revision.
+
 Errors in this viewer are mine; the original docs are the source of truth. If you spot a discrepancy, please [open an issue](https://github.com/hypery11/flipper-one-pinout/issues) or send a PR against `pins.js`.
 
 ## Local development
